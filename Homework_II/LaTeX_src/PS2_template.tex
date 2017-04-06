@@ -10,6 +10,7 @@
 \usepackage{hyperref}
 \usepackage{url}
 \numberwithin{equation}{section}
+\usepackage[multiple]{footmisc}
 %\usepackage[thmmarks, amsmath, thref]{ntheorem}
 \theoremstyle{definition}
 \newtheorem*{solution}{Solution}
@@ -41,7 +42,7 @@
 
 \begin{figure}[h]{}
 \centering 
-\includegraphics[scale=0.6]{Images/1.png}
+\includegraphics[scale=0.6]{1.png}
 \caption{Contours of $\mathbf{g}$ and $\mathbf{f}$}
 \end{figure} 
 Denote the function we wish to minimize as $f(\mathbf{w}) = -\mathbf{w}^\mathrm{T} \mathbf{S}_b\mathbf{w}$, and the constraint function as  $g(\mathbf{w}) =  \mathbf{w}^\mathrm{T} \mathbf{S}_w\mathbf{w} - 1 $. 
@@ -144,10 +145,35 @@ Therefore, let $\mathbf{\boldsymbol\beta_i} = (\mathbf{w_i};b_i)$ and $\mathbf{\
 
 (2) \textbf{[5pts]} 请简要谈谈你对本次编程实践的感想(如过程中遇到哪些障碍以及如何解决, 对编程实践作业的建议与意见等)。
 \begin{solution}
-(2) 实验中常常遇到考虑矩阵纬度以及如何正确
+(2) The problem of Overflow and Underflow happens a lot. Take the sigmoid function as an example, when -x is sufficiently large, \texttt{np.exp(-x)} would raise \texttt{Overflow Exception}. To avoid this, I re-write the function in Python as follows:
+\begin{verbatim}
+def sigmoid(x):
+    max_elem = max(-x) 
+    try: 
+        	ans = np.exp(-(np.log(np.exp(0 - max_elem) + np.exp(- x - max_elem)) + max_elem ) )
+    except Exception as e:
+        ans = 0
+    return res
+\end{verbatim}
+The principle behind is:
+\begin{equation}
+\log{(e^a + e^b)} = \log{(e^{a-m} + e^{b-m})} + m
+\end{equation}
+Then only underflow would happen. In this case, since the value is sufficiently low, we dismiss the exception and set \texttt{ans} to 0.
+
 \end{solution}
-
-
+Another problem evolves the \texttt{SingularMatrix Exception}  when running  \texttt{np.linalg.inv(hess)}. Therefore, we could catch the exception and try to determine whether Hessian matrix is too small, if it does, we alternate to gradient descent.
+\begin{verbatim}
+        try:
+            inv = np.linalg.inv(hess)
+            beta -= np.matmul(inv, grad(X, beta, y))
+        except Exception as e:
+            if(np.max(hess) < np.exp(-100)):
+                break
+            else:
+                beta = beta_save - grad(X, beta, y)
+\end{verbatim}
+The third problem is about the initial value of $w$. When set to all ones, the training algorithm would never converge. This problem was finally found and fixed by setting $w$ to all zeros, after debugging in the dormitory for a whole spring morning ;\_;.
 \section{[35pts] Linear Regression with Regularization Term}
 
 给定数据集$D = \{(\mathbf{x}_1,y_1),(\mathbf{x}_2,y_2),\cdots,(\mathbf{x}_m,y_m)\}$, 其中$\mathbf{x}_i = (x_{i1};x_{i2};\cdots;x_{id}) \in \mathbb{R}^d$, $y_i \in \mathbb{R}$, 当我们采用线性回归模型求解时, 实际上是在求解下述优化问题：
@@ -186,16 +212,16 @@ Therefore, let $\mathbf{\boldsymbol\beta_i} = (\mathbf{w_i};b_i)$ and $\mathbf{\
 (1)  Let 
 \begin{equation}
 \begin{split}
-J(\mathbf{w}) &=\lVert \mathbf{y} - \mathbf {X}\mathbf{w} \rVert_2^2 = \frac{1}{2m}(\mathbf{Xw-y})^T(\mathbf{Xw-y}) \\
-&= \mathbf{	(Xw)^TXw-(Xw)^Ty-y^T(Xw)+y^Ty	}
+J(\mathbf{w}) &= \frac{1}{2} \lVert \mathbf{y} - \mathbf {X}\mathbf{w} \rVert_2^2 = \frac{1}{2} (\mathbf{Xw-y})^T(\mathbf{Xw-y}) \\
+&= \frac{1}{2}  (\mathbf{	(Xw)^TXw-(Xw)^Ty-y^T(Xw)+y^Ty	})
 \end{split}
 \end{equation}
 Since
 \begin{equation}
 \label{J:s}
-\frac{\partial J}{\partial\mathbf{w}}=\mathbf{2X^TXw-2X^{T}y}
+\frac{\partial J}{\partial\mathbf{w}}=\mathbf{X^TXw-X^{T}y}
 \end{equation}
-Let  \eqref{J:s} = 0, we get 
+Let  \eqref{J:s} = 0, since $\mathbf{X}^\mathrm{T}\mathbf{X} = \mathbf{I}$, we have
 \begin{equation}
 \mathbf{w}=\mathbf{(X^T X)^{-1}X^T y} = \mathbf{X^T y}
 \end{equation}
@@ -203,26 +229,87 @@ Let  \eqref{J:s} = 0, we get
 (2)	Let 
 \begin{equation}
 \begin{split}
-J(\mathbf{w}) &=\lVert \mathbf{y} - \mathbf X \mathbf{w} \rVert_2^2 + \lVert \mathbf{w}\rVert_2^2 \\
-&= \mathbf{	(Xw)^TXw-2(Xw)^Ty+y^Ty	 + w^Tw}
+J(\mathbf{w}) &= \frac{1}{2}\lVert \mathbf{y} - \mathbf X \mathbf{w} \lambda \rVert_2^2 + \lVert \mathbf{w}\rVert_2^2 \\
+&= \frac{1}{2} (\mathbf{(Xw)^TXw-2(Xw)^Ty+y^Ty)	 + \lambda w^Tw}
 \end{split}
 \end{equation}
-
- Since
+Since
 \begin{equation}
 \label{J:s-norm}
-\frac{\partial J}{\partial\mathbf{w}}=\mathbf{2X^TXw-2X^{T}y + w}
+\frac{\partial J}{\partial\mathbf{w}}=\mathbf{X^TXw-X^{T}y + \lambda w}
 \end{equation}
-Let  \eqref{J:s-norm} = 0, we get 
+Let  \eqref{J:s-norm} = 0, we have
 \begin{equation}
-\mathbf{w}=\mathbf{(X^T X + I_d)^{-1}X^T y}  = \mathbf{\frac{1}{2}X^T y} 
+\mathbf{w}=\mathbf{(X^T X + \lambda I_d)^{-1}X^T y}  = \mathbf{\frac{1}{1 + \lambda}X^T y} 
 \end{equation}
 ~\\
-~\\
+\newcommand{\wls}{\hat{\mathbf{w}}^{{\small \text{LS}}}}
+\newcommand{\boldw}{\mathbf{w}}
+\newcommand{\wlasso}{\hat{\mathbf{w}}^{{\text{lasso}}}} 
+(3) Let $\wls$ denote the solution to \eqref{eq:ls}($\textit{i.e.}$ $\wls = \mathbf{X^T y}$), we have:
+\begin{equation}
+\begin{split}
+J(\mathbf{w})  &=  \frac{1}{2} \| \mathbf{y - X w} \|_2^2 + \lambda \| \mathbf{w}\|_1   \\
+&=  \frac{1}{2} (\mathbf{w^TX^TXw-2(Xw)^Ty+y^Ty)	 + \lambda  \| \mathbf{w}\|_1  }  \\
+&=  \frac{1}{2} (\mathbf{\sum_{i=1}^{d} w_i^2 - 2wX^Ty+y^Ty)	 + \lambda  \| \mathbf{w}\|_1  } \\
+&=  \frac{1}{2} (\mathbf{\sum_{i=1}^{d} (w_i^2 - 2w_i \wls_i) + y^Ty)	 + \lambda  \| \mathbf{w}\|_1  } 
+\end{split}
+\end{equation}
+Since $\mathbf{y^Ty}$ is irrelevant to $\mathbf{w}$ we have it discarded. Therefore:
+\begin{equation}
+\min_{\boldw}J(\mathbf{w})  =\min_{\boldw} \sum_{i=1}^{d}(\frac{1}{2} \boldw_i^2 - \boldw_i \wls_i +  \lambda |\mathbf{\boldw_i}|) 
+\end{equation}
+Where $\boldw_i$ is independent to $\boldw_j (i \neq j)$, and we can minimize the whole $J(\mathbf{w})$ by finding $\boldw_k (k = 1, 2, 3 ..., d)$ one by one, $\textit{i.e}$. for every $k \in [1, d]$, we need to find
+\begin{equation} 
+\min_{\boldw_k}J(\boldw_k) = \min_{\boldw_k} (\frac{1}{2} \boldw_k^2 - \boldw_k \wls_k +  \lambda |\mathbf{\boldw_k}|)
+\end{equation}
+Since the value of $\frac{1}{2} \boldw_k^2$ and $\lambda |\mathbf{\boldw_k}|$ is independent to the sign, if  $\wls_k > 0$ then $\boldw_k$ must be $\geq 0$.  If $\wls_k \leq 0$ then $\boldw_k \leq 0$. 
+Then:
+\begin{equation} 
+\label{J:w_k}
+J(\boldw_k) = \left\{ \begin{array}{ll}
+ \frac{1}{2} \boldw_k^2 - \boldw_k \wls_k +  \lambda \boldw_k & ,\wls_k > 0 \\
+\frac{1}{2}  \boldw_k^2 - \boldw_k \wls_k -  \lambda  \boldw_k  &,\wls_k \leq 0
+  \end{array} \right.
+\end{equation}
+In either case, we have:
+\begin{equation}
+\frac{\partial J(\boldw_k)}{\partial\mathbf{w_k}} = \boldw_k -  \wls_k +  \text{sign}(\wls_k) \cdot \lambda
+\end{equation}
+Therefore, the closed-form solution is given by:\footnotemark
+\begin{equation}
+\wlasso_k = \left\{ \begin{array}{ll}
+\wls_k - \text{sign}(\wls_k) \cdot \lambda &, \lambda < |\wls_k| \\
+0  &, \lambda > |\wls_k|
+  \end{array} \right.
+\end{equation}
+\newcommand{\wlz}{\hat{\mathbf{w}}^{\ell_0}}
+(4) Let
+\begin{equation}
+\begin{split}
+J(\mathbf{w})   &=  \frac{1}{2} (\mathbf{(\sum_{i=1}^{d} (w_i^2 - 2w_i \wls_i) + y^Ty)	 + \lambda  \| \mathbf{w}\|_0  } 
+\end{split}
+\end{equation}
+Similar to \eqref{J:w_k}, we have: 
+\begin{equation} 
+J(\boldw_k) = \left\{ \begin{array}{ll}
+0  & ,\boldw_k = 0 \\
+\frac{1}{2}  \boldw_k^2 - \boldw_k \wls_k +  \lambda  &,\boldw_k \neq 0
+ \end{array} \right.
+\end{equation}
+Therefore, from basic principles of the quadratic equation, we have
+\begin{equation}
+\wlz_k = \left\{ \begin{array}{ll}
+\wls_k \pm \sqrt{(\wls_k)^2 - 2\lambda} &,  (\wls_k)^2  - 2\lambda > 0 \\
+0  								&,  (\wls_k)^2  - 2\lambda \leq 0
+  \end{array} \right.
+\end{equation}
+if $\mathbf{X}$  is non-orthonormal,  since the $L0$-penalty makes the solution non-linear,  rendering the minimization a  quadratic programming problem, which is NP-hard in general. \footnotemark    \footnotemark 
 ~\\
 ~\\
 \end{solution}
 
-
-
+\footnotetext[3]{ C Leng.  A note on the Lasso in Model Selection Statistica Sinica 16(2006), 1273-1284}
+\footnotetext[4]{Cedric E. Ginestet,  Regularization: Ridge Regression and Lasso,  Boston University, MA 575 Linear Models, Week 14, Lecture 2}
+\footnotetext[5]{SA Vavasis, Quadratic programming is in NP, 1990-02, Cornell University}
 \end{document}

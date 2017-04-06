@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[3]:
 
 import numpy as np
 from numpy import seterr
@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 np.seterr(over='raise', under='ignore', divide='raise')
 
 
-# In[3]:
+# In[4]:
 
 data = np.genfromtxt('data.csv', delimiter = ',')
 data = sklearn.preprocessing.normalize(data)
@@ -20,7 +20,7 @@ target = np.genfromtxt('targets.csv', delimiter = ',')
 data_hat = np.append(data, np.ones([data.shape[0], 1]), 1)
 
 
-# In[4]:
+# In[5]:
 
 def sigmoid(x):
     max_elem = max(-x) 
@@ -36,7 +36,7 @@ def sigmoid(x):
     return res
 
 
-# In[5]:
+# In[6]:
 
 def hypo(x_hat, beta):
     return sigmoid(np.matmul(x_hat, beta))
@@ -92,29 +92,33 @@ def hessian(x_hat, beta):
     return res
 
 
-# In[11]:
+# In[36]:
 
 def my_train(X, y, iter, beta):
     for i in range(iter):
         p1 = prob_eq_one(X, beta)
         hess = hessian(X, beta)
+        beta_save = beta
         try:
             inv = np.linalg.inv(hess)
             beta -= np.matmul(inv, grad(X, beta, y))
         except Exception as e:
-            break
+            if(np.max(hess) < 0.000001):
+                break
+            else:
+                beta = beta_save - grad(X, beta, y)
     print(error(data_hat, beta, target))
     return beta
 
 
-# In[12]:
+# In[37]:
 
 # Train the model with K-Fold
 kf = KFold(n_splits=10)
 kf.get_n_splits(data)
 
 
-# In[13]:
+# In[38]:
 
 for k, (train, test) in enumerate(kf.split(data, target)):
     m = data_hat[test].shape[0]
@@ -126,14 +130,9 @@ for k, (train, test) in enumerate(kf.split(data, target)):
     to_save = np.dstack((test + 1 , to_save[:,0]))[0]
     np.savetxt('fold%d.csv'%(k+1), to_save, "%d,%d", delimiter=',')
 
-#Test on all dataset
 
+# In[40]:
+
+#Test on all dataset
 # beta = np.zeros(data_hat.shape[1], dtype=float)
-# print(error(data_hat, beta, target))
-# beta = my_train(data_hat, target, 100, beta)# Test  on a small data set A
-# A = np.array([[1,0], [0, 1]])
-# A_hat = np.append(A, np.ones([A.shape[0], 1]), 1)
-# A_y = np.array([[0], [1]])A_beta = np.array([[0], [1], [1]], dtype=float)
-# iter = 100
-# for i in range(iter):
-#     A_beta -= trans(grad(A_hat, A_beta, A_y)) / hessian(A_hat, A_beta, A_y)
+# beta = my_train(data_hat, target, 100, beta)
