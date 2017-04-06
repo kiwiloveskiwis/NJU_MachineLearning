@@ -162,7 +162,7 @@ The principle behind is:
 Then only underflow would happen. In this case, since the value is sufficiently low, we dismiss the exception and set \texttt{ans} to 0.
 
 \end{solution}
-Another problem evolves the \texttt{SingularMatrix Exception}  when running  \texttt{np.linalg.inv(hess)}. Therefore, we could catch the exception and try to determine whether Hessian matrix is too small, if it does, we alternate to gradient descent.
+Another problem evolves the \texttt{SingularMatrix Exception}  when running  \texttt{np.linalg.inv(hess)}. Therefore, we could catch the exception and try to determine whether Hessian matrix is too small, if it does not(which means result has't converged), we alternate to gradient descent.
 \begin{verbatim}
         try:
             inv = np.linalg.inv(hess)
