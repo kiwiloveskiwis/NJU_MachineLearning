@@ -103,7 +103,7 @@ def my_train(X, y, iter, beta):
             inv = np.linalg.inv(hess)
             beta -= np.matmul(inv, grad(X, beta, y))
         except Exception as e:
-            if(np.max(hess) < 0.000001):
+            if(np.max(hess) < np.exp(-100)):
                 break
             else:
                 beta = beta_save - grad(X, beta, y)

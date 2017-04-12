@@ -43,7 +43,7 @@
 \begin{figure}[h]{}
 \centering 
 \includegraphics[scale=0.6]{1.png}
-\caption{Contours of $\mathbf{g}$ and $\mathbf{f}$}
+\caption{Contours of $\mathbf{g}$ and $\mathbf{f}$ }
 \end{figure} 
 Denote the function we wish to minimize as $f(\mathbf{w}) = -\mathbf{w}^\mathrm{T} \mathbf{S}_b\mathbf{w}$, and the constraint function as  $g(\mathbf{w}) =  \mathbf{w}^\mathrm{T} \mathbf{S}_w\mathbf{w} - 1 $. 
 Then, we should find a stationary point where $f(\mathbf{w}) $ doesn't change along the contours\footnotemark  of $g(\mathbf{w}) = 0$ (Otherwise, then we can follow the direction where $\nabla_{\mathbf{w}}f < 0 $ and get a smaller value ).   In this case, the contour lines of $\mathbf{g}$ and $\mathbf{f}$ must be parallel, which indicates that the derivatives of $\mathbf{g}$ and $\mathbf{f}$ are also parallel \footnotemark.  Therefore: 
@@ -58,11 +58,25 @@ Since
  \begin{equation}
  \lambda \nabla_{ \mathbf{w}} g = \lambda \frac{ \partial}{\partial\mathbf{w} }  (  \mathbf{w}^\mathrm{T} \mathbf{S}_w\mathbf{w} - 1) =\lambda (\mathbf{S}_w+ \mathbf{S}_w^T) \mathbf{w} = 2  \lambda\mathbf{S}_w \mathbf{w}
  \end{equation}
-Combine them together, we finally get 
+Combine them together, we have 
   \begin{equation}
   \mathbf{S}_b\mathbf{w} = \lambda \mathbf{S}_w\mathbf{w}
    \end{equation}
-
+To prove that  equation \eqref{dual} leads to equation \eqref{primal},  we  introduce the auxiliary $\mathcal{L}(x,y,\lambda)$: 
+ \begin{equation} 
+\mathcal{L}(\mathbf{w},\lambda) = f(\mathbf{w}) - \lambda \cdot g(\mathbf{w})
+ \end{equation}
+Therefore
+  \begin{equation} 
+ \nabla_{\mathbf{w}, \lambda} \mathcal{L}(\mathbf{w}, \lambda)=0.\iff
+ \begin{cases}
+\nabla_{\mathbf{w}} f(\mathbf{w}) = \lambda \nabla_{\mathbf{w}} g(\mathbf{w})\\
+ g(\mathbf{w}) = 0
+\end{cases}
+ \end{equation}
+ If  $g(\mathbf{w}) = 0$, then the min value of $ \mathcal{L}(\mathbf{w})$ indicates the min value of $f(\mathbf{w})$. 
+Since we already have $\nabla_{\mathbf{w}} f(\mathbf{w}) = \lambda \nabla_{\mathbf{w}} g(\mathbf{w})$, whenever $g(\mathbf{w}) = 0$, we have the min value of $\nabla_{\mathbf{w}} $ and therefore the min value of $f(\mathbf{w})$.
+ 
 \footnotetext[1]{Image Reference: https://cuhkmath.wordpress.com/2010/10/12/understanding-lagrange-multipliers/ }
 \footnotetext[2]{ \href{https://www.wikiwand.com/en/Lagrange_multiplier}{Wikipedia - Lagrange multiplier}}
 
@@ -236,11 +250,11 @@ J(\mathbf{w}) &= \frac{1}{2}\lVert \mathbf{y} - \mathbf X \mathbf{w} \lambda \rV
 Since
 \begin{equation}
 \label{J:s-norm}
-\frac{\partial J}{\partial\mathbf{w}}=\mathbf{X^TXw-X^{T}y + \lambda w}
+\frac{\partial J}{\partial\mathbf{w}}=\mathbf{X^TXw-X^{T}y + 2 \lambda w}
 \end{equation}
 Let  \eqref{J:s-norm} = 0, we have
 \begin{equation}
-\mathbf{w}=\mathbf{(X^T X + \lambda I_d)^{-1}X^T y}  = \mathbf{\frac{1}{1 + \lambda}X^T y} 
+\mathbf{w}=\mathbf{(X^T X + 2\lambda I_d)^{-1}X^T y}  = \mathbf{\frac{1}{1 +2 \lambda}X^T y} 
 \end{equation}
 ~\\
 \newcommand{\wls}{\hat{\mathbf{w}}^{{\small \text{LS}}}}
@@ -300,16 +314,16 @@ J(\boldw_k) = \left\{ \begin{array}{ll}
 Therefore, from basic principles of the quadratic equation, we have
 \begin{equation}
 \wlz_k = \left\{ \begin{array}{ll}
-\wls_k \pm \sqrt{(\wls_k)^2 - 2\lambda} &,  (\wls_k)^2  - 2\lambda > 0 \\
+\wls_k  &,  (\wls_k)^2  - 2\lambda > 0 \\
 0  								&,  (\wls_k)^2  - 2\lambda \leq 0
   \end{array} \right.
 \end{equation}
-if $\mathbf{X}$  is non-orthonormal,  since the $L0$-penalty makes the solution non-linear,  rendering the minimization a  quadratic programming problem, which is NP-hard in general. \footnotemark    \footnotemark 
+The orthonormality of $\mathbf{X}$ generally assumes the independency between columns of $\wlz$ . if $\mathbf{X}$  is non-orthonormal,   the $L0$-penalty makes the solution non-convex,   which is NP-hard in general.
+ \footnotemark   
 ~\\
 ~\\
 \end{solution}
 
 \footnotetext[3]{ C Leng.  A note on the Lasso in Model Selection Statistica Sinica 16(2006), 1273-1284}
 \footnotetext[4]{Cedric E. Ginestet,  Regularization: Ridge Regression and Lasso,  Boston University, MA 575 Linear Models, Week 14, Lecture 2}
-\footnotetext[5]{SA Vavasis, Quadratic programming is in NP, 1990-02, Cornell University}
 \end{document}
