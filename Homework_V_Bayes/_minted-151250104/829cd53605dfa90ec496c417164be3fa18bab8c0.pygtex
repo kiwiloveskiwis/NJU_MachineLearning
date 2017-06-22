@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYGdefault{n}{RATIO} \PYGdefault{o}{=} \PYGdefault{l+m+mi}{1} \PYGdefault{c+c1}{\PYGdefaultZsh{} we don\PYGdefaultZsq{}t know it yet}
+
+\PYGdefault{k}{for} \PYGdefault{n}{ins} \PYGdefault{o+ow}{in} \PYGdefault{n+nb}{range}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{,} \PYGdefault{n}{data}\PYGdefault{o}{.}\PYGdefault{n}{shape}\PYGdefault{p}{[}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{]):}
+	\PYGdefault{k}{for} \PYGdefault{n}{cval} \PYGdefault{o+ow}{in} \PYGdefault{n+nb}{range}\PYGdefault{p}{(}\PYGdefault{n}{num\PYGdefaultZus{}of\PYGdefaultZus{}class}\PYGdefault{p}{):} \PYGdefault{c+c1}{\PYGdefaultZsh{} class\PYGdefaultZus{}value}
+		\PYGdefault{n}{discrete\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{=} \PYGdefault{l+m+mi}{0}
+		\PYGdefault{n}{continuous\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{=} \PYGdefault{l+m+mi}{0}
+		\PYGdefault{k}{for} \PYGdefault{n}{i} \PYGdefault{o+ow}{in} \PYGdefault{n+nb}{range}\PYGdefault{p}{(}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{,} \PYGdefault{l+m+mi}{5000}\PYGdefault{p}{):}
+			\PYGdefault{k}{if}\PYGdefault{p}{(}\PYGdefault{n}{i} \PYGdefault{o}{\PYGdefaultZlt{}} \PYGdefault{l+m+mi}{2500}\PYGdefault{p}{):}
+				\PYGdefault{n}{discrete\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{+=} \PYGdefault{o}{...}
+			\PYGdefault{k}{else}\PYGdefault{p}{:}
+				\PYGdefault{n}{continuous\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{+=} \PYGdefault{o}{...}
+		\PYGdefault{n}{ratio}\PYGdefault{p}{[}\PYGdefault{n}{ins}\PYGdefault{p}{,} \PYGdefault{n}{cval}\PYGdefault{p}{]} \PYGdefault{o}{=} \PYGdefault{n}{continuous\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{/} \PYGdefault{n}{discrete\PYGdefaultZus{}prob\PYGdefaultZus{}sum}
+		\PYGdefault{n}{class\PYGdefaultZus{}prob}\PYGdefault{p}{[}\PYGdefault{n}{cval}\PYGdefault{p}{]} \PYGdefault{o}{=} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{log}\PYGdefault{p}{(}\PYGdefault{n}{cmat}\PYGdefault{o}{.}\PYGdefault{n}{shape}\PYGdefault{p}{[}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{]} \PYGdefault{o}{/} \PYGdefault{n}{data}\PYGdefault{o}{.}\PYGdefault{n}{shape}\PYGdefault{p}{[}\PYGdefault{l+m+mi}{0}\PYGdefault{p}{])}
+	  		\PYGdefault{o}{+} \PYGdefault{n}{discrete\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{+} \PYGdefault{n}{continuous\PYGdefaultZus{}prob\PYGdefaultZus{}sum} \PYGdefault{o}{*} \PYGdefault{n}{RATIO}
+	\PYGdefault{n}{predict\PYGdefaultZus{}y}\PYGdefault{p}{[}\PYGdefault{n}{ins}\PYGdefault{p}{]} \PYGdefault{o}{=} \PYGdefault{n}{np}\PYGdefault{o}{.}\PYGdefault{n}{argmax}\PYGdefault{p}{(}\PYGdefault{n}{class\PYGdefaultZus{}prob}\PYGdefault{p}{)}
+\PYGdefault{o}{.....}
+\end{Verbatim}
