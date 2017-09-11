@@ -18,6 +18,9 @@
 \begin{document}
 \title{习题一}
 \author{151250104, 卢以宁}
+\date{2017 年 3 月 12 日}
+
+
 \maketitle
 
 
@@ -37,7 +40,12 @@
 \begin{prove}
 由定义，\[ \text{AUC} =  \frac{1}{2} \sum^{m-1}_{i=1}(x_{i+1}-x_{i})(y_i+y_{i+1}) \] \\
 而设排序后第k个样例为$s_k, (k = 2, 3, 4..., m)$, 对应的坐标为$(x_{k},y_{k})$,则
-\begin{displaymath}(x_{k}-x_{k-1})(y_k+y_{k-1}) = \left\{ \begin{array}{ll} 0 & \textrm{ $s_k\in D^+$}\\\frac{1}{m^-}\cdot y_k & \textrm{ $s_i\in D^-$}  \end{array} \right.\end{displaymath}
+\begin{displaymath}
+(x_{k}-x_{k-1})(y_k+y_{k-1}) = \left\{ \begin{array}{ll}
+ 0 & \textrm{ $s_k\in D^+$}\\
+\frac{1}{m^-}\cdot y_k & \textrm{ $s_i\in D^-$}
+  \end{array} \right.
+\end{displaymath}
 其中, $y_k$ 是由$s_k$及其之前的真正例数决定的. 
 \[
 y_k = \frac{1}{m^+}\cdot \sum_{x^+ \in D^+} \left( \mathbb{I} \left( f(x^+)>f(x_k) \right)  +  \frac{1}{2} {I}\left(f(x^+)=f(x_k)\right) \right)
@@ -67,9 +75,9 @@ y_k = \frac{1}{m^+}\cdot \sum_{x^+ \in D^+} \left( \mathbb{I} \left( f(x^+)>f(x_
 $$ R =\frac{1}{3}, F_1 = \frac{2 \times P\times R }{P+R} = \frac{1}{2} $$ 
 
  }
-\item[(b)] {将所有样例预测为正例, 查全率为100\%。此时\\
+\item[(b)] {将所有正例预测为正例, 查全率为100\%。此时将2个坏瓜误认为好瓜。\\
 
-$$ P = \frac{TP}{TP+FP} = \frac{3}{10}, F_1 = \frac{2 \times P\times R }{P+R} = \frac{6}{13} $$ 
+$$ P = \frac{TP}{TP+FP} = \frac{3}{5}, F_1 = \frac{2 \times P\times R }{P+R} = \frac{3}{4} $$ 
 }
 \end{itemize}
 

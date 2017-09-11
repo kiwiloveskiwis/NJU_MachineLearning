@@ -1,8 +1,12 @@
-GH-ML
 *.zip
 *.gz
 *.out
 *.log
 *.aux
 *.fls
+other
+*
+!*.pdf
+!*.py
+!*.ipynb
 
