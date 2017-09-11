@@ -4,9 +4,10 @@
 *.log
 *.aux
 *.fls
-other
+others
 *
 !*.pdf
 !*.py
 !*.ipynb
+
 
